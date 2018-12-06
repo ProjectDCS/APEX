@@ -6,13 +6,15 @@ function tableLength(T)
 end
 function randomizeSelectTable(maxIndex, maxCount)
     local SelectedTable = {}
-    for order, zone in pairs(SelectedTable) do
-        local zoneSelectRandom = math.random( 1, ZoneToPopulateCount )
+        
+    local i = 1
+    repeat
+        local zoneSelectRandom = math.random( 1, maxIndex )
         SelectedTable[zoneSelectRandom] = true
-        if tableLength(SelectedTable) == maxCount then
-            break
-        end
-    end
+    until (tableLength(SelectedTable) == maxCount)
+        -- i = i + 1
+    -- until (i == 20)
+
     return SelectedTable
 end
 
@@ -20,17 +22,56 @@ end
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 CaptureZoneString = "Capture Zone #"
-REDCaptureZoneString = "Red Capture Zone #"
 
 local ZoneCount = 15
 local ZoneToPopulateCount = 5
 
+local Zones = {
+    ["Blue"] = {},
+    ["Red"] = {}
+}
+
+
+function startZoneCoalition(zone, coalitionString)
+
+    local ZoneCaptureCoalition
+    if coalitionString == 'Blue' then
+        ZoneCaptureCoalition = ZONE_CAPTURE_COALITION:New( zone, coalition.side.BLUE )
+        ZoneCaptureCoalition:Start( 5, 10 )
+        ZoneCaptureCoalition:__Guard(2)
+    elseif coalitionString == 'Red' then
+        ZoneCaptureCoalition = ZONE_CAPTURE_COALITION:New( zone, coalition.side.RED )
+        ZoneCaptureCoalition:Start( 5, 10 )
+        ZoneCaptureCoalition:__Guard(1)
+    end
+
+    ZoneCaptureCoalition:MonitorDestroyedUnits()
+    ZoneCaptureCoalition:Mark()
+
+    local function refreshMark(something)
+        ZoneCaptureCoalition:Mark()
+    end
+    SCHEDULER:New(nil, refreshMark, {"something"}, 10, 10)
+
+    function ZoneCaptureCoalition:OnEnterCaptured( From, Event, To )
+        local Coalition = self:GetCoalition()
+        if Coalition == coalition.side.BLUE then
+            SpawnZoneBaseRandomSpawn("Blue", zone)
+        else
+            SpawnZoneBaseRandomSpawn("Red", zone)
+        end
+    end
+    
+    -- local zoneName = ZoneCaptureCoalition:GetZoneName()
+    -- Zones[coalitionString][zoneName] = ZoneCaptureCoalition
+end
 
 function populateZones(coalitionString, selectedZones)
-    for index, value in pair(selectedZones) do
+    for index, value in pairs(selectedZones) do
         local zoneString = coalitionString .. " " .. CaptureZoneString .. tostring(index)
         local zone = ZONE:New(zoneString)
         SpawnZoneBaseRandomSpawn(coalitionString, zone)
+        startZoneCoalition(zone, coalitionString)
     end
 end
 
@@ -41,7 +82,24 @@ function startPopulateZones(something)
 
     populateZones("Blue", SelectedBlueZonesTable)
     populateZones("Red", SelectedRedZonesTable)
+
+    env.info("CON: Final Blue Zones" .. UTILS.OneLineSerialize(Zones))
 end
-SCHEDULER:New(nil, populateZones, {"sdfsdfd"}, 5)
+
+SCHEDULER:New(nil, startPopulateZones, {"sdfsdfd"}, 2)
+
+
+
+
+
+
+
+
+
+-- local function debugTrigger(something)
+--     SpawnZoneBaseRandomSpawn(coalitionString, zone)
+-- end
+
+-- SCHEDULER:New(nil, debugTrigger, {"somethine"}, 45)
 
 env.info('CON: Zones finished')

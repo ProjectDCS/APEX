@@ -22,10 +22,10 @@ local SpawnsTable = {
     ["Red"] = {}
 }
 
-function SpawnZoneBaseSpawn(coalitionString, zone)
+function SpawnZoneBaseRandomSpawn(coalitionString, zone)
     local random = math.random( 1, CaptureZoneBaseTemplateCount )
     local baseString = coalitionString .. " " .. CaptureZoneBaseString .. tostring(random)
-    for i = 1, BLUECaptureZoneBaseTemplateCount do
+    for i = 1, CaptureZoneBaseTemplateGroupCount do
         local spawnString = baseString .. "(" .. tostring(i) .. ")"
         local spawn = SpawnsTable[coalitionString][spawnString]
         if spawn == nil then
