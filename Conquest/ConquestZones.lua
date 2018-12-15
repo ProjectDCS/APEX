@@ -31,7 +31,6 @@ local Zones = {
     ["Red"] = {}
 }
 
-
 function startZoneCoalition(zone, coalitionString)
 
     local ZoneCaptureCoalition
@@ -45,14 +44,24 @@ function startZoneCoalition(zone, coalitionString)
         ZoneCaptureCoalition:__Guard(1)
     end
 
-    ZoneCaptureCoalition:MonitorDestroyedUnits()
-    ZoneCaptureCoalition:Mark()
+    local zoneName = ZoneCaptureCoalition:GetZoneName()
+    Zones[coalitionString][zoneName] = ZoneCaptureCoalition
 
-    local function refreshMark(something)
-        ZoneCaptureCoalition:Mark()
+    ---------------------------------------------------------------------------------------
+    
+    function ZoneCaptureCoalition:OnAfterDestroyedUnit(From, Event, To, unit, PlayerName)
+        env.info(string.format('CON: Detected destroyed unit %s', Event))
+        env.info("CON: Detected hit in zone " .. ZoneCaptureCoalition:GetZoneName())
     end
-    SCHEDULER:New(nil, refreshMark, {"something"}, 10, 10)
-
+    function ZoneCaptureCoalition:OnEnterGuarded( From, Event, To )
+        env.info("CON: Detected Guarded in zone " .. ZoneCaptureCoalition:GetZoneName())
+    end
+    function ZoneCaptureCoalition:OnEnterAttacked(From, Event, To)
+        env.info("CON: Detected Atack in zone " .. ZoneCaptureCoalition:GetZoneName())
+    end
+    function ZoneCaptureCoalition:OnEnterEmpty()
+        env.info("CON: Detected Empty in zone " .. ZoneCaptureCoalition:GetZoneName())
+    end
     function ZoneCaptureCoalition:OnEnterCaptured( From, Event, To )
         local Coalition = self:GetCoalition()
         if Coalition == coalition.side.BLUE then
@@ -61,10 +70,18 @@ function startZoneCoalition(zone, coalitionString)
             SpawnZoneBaseRandomSpawn("Red", zone)
         end
     end
-    
-    -- local zoneName = ZoneCaptureCoalition:GetZoneName()
-    -- Zones[coalitionString][zoneName] = ZoneCaptureCoalition
+
+    -------------------------------------------------------------------------------------
+
+    local function refreshMark(something)
+        ZoneCaptureCoalition:Mark()
+    end
+    SCHEDULER:New(nil, refreshMark, {"something"}, 10, 10)
+
+    -- ZoneCaptureCoalition:MonitorDestroyedUnits()
+    ZoneCaptureCoalition:Mark()
 end
+
 
 function populateZones(coalitionString, selectedZones)
     for index, value in pairs(selectedZones) do
@@ -83,7 +100,7 @@ function startPopulateZones(something)
     populateZones("Blue", SelectedBlueZonesTable)
     populateZones("Red", SelectedRedZonesTable)
 
-    env.info("CON: Final Blue Zones" .. UTILS.OneLineSerialize(Zones))
+    env.info("CON: Blue Zones " .. UTILS.OneLineSerialize(Zones["Blue"]))
 end
 
 SCHEDULER:New(nil, startPopulateZones, {"sdfsdfd"}, 2)
