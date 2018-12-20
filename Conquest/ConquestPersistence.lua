@@ -189,7 +189,7 @@ function readOrCreateZoneFile(stopLoop)
 end
 function saveZoneFile(zoneTableToSave)
     table.save(zoneTableToSave, zoneFilePath)
-    env.info("CON: Persistence Save file complete")
+   --  env.info("CON: Persistence Save file complete")
 end
 
 function startPersistenceEngine(something)

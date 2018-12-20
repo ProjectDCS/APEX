@@ -26,7 +26,7 @@ CaptureZoneString = "Capture Zone #"
 local ZoneCount = 15
 local ZoneToPopulateCount = 5
 
-local Zones = {
+ConquestZones = {
     ["Blue"] = {},
     ["Red"] = {}
 }
@@ -45,7 +45,7 @@ function startZoneCoalition(zone, coalitionString)
     end
 
     local zoneName = ZoneCaptureCoalition:GetZoneName()
-    Zones[coalitionString][zoneName] = ZoneCaptureCoalition
+    ConquestZones[coalitionString][zoneName] = ZoneCaptureCoalition
 
     ---------------------------------------------------------------------------------------
     
@@ -100,7 +100,7 @@ function startPopulateZones(something)
     populateZones("Blue", SelectedBlueZonesTable)
     populateZones("Red", SelectedRedZonesTable)
 
-    env.info("CON: Blue Zones " .. UTILS.OneLineSerialize(Zones["Blue"]))
+    env.info("CON: Blue Zones " .. UTILS.OneLineSerialize(ConquestZones["Blue"]))
 end
 
 SCHEDULER:New(nil, startPopulateZones, {"sdfsdfd"}, 2)
