@@ -1,12 +1,24 @@
 
 SupportHandler = EVENTHANDLER:New()
 
+local function ternary ( cond , T , F )
+    if cond then return T else return F end
+end
+
 --------------------------------------------------------------------------------------
 local voteOn = true -- DEBUG
-local voteTable = {}
+local voteInProgressCoalition = ""
+local voteTables = {
+    ["Blue"] = {},
+    ["Red"] = {}
+}
+local voteResult = {
+    ["Blue"] = nil,
+    ["Red"] = nil
+}
 
-local function handleVote(coord, coalitionZones) --assumes ZONE_CAPTURE_COALITION table and not ZONE
-    if voteOn == false then
+local function handleVote(coord, coalitionZones, coalitionString) --assumes ZONE_CAPTURE_COALITION table and not ZONE
+    if voteOn == false or voteInProgressCoalition ~= coalitionString then
         env.info("CON: Vote is not in progress") -- notify user
         return
     end
@@ -24,36 +36,43 @@ local function handleVote(coord, coalitionZones) --assumes ZONE_CAPTURE_COALITIO
 
     env.info("CON: voting result " .. associatedZone)
 
-    if voteTable[associatedZone] == nil then
-        voteTable[associatedZone] = 0
+    if voteTables[coalitionString][associatedZone] == nil then
+        voteTables[coalitionString][associatedZone] = 0
     end
-    voteTable[associatedZone] = voteTable[associatedZone] + 1
-    env.info("CON: voteTable " .. UTILS.OneLineSerialize(voteTable))
+    voteTables[coalitionString][associatedZone] = voteTables[coalitionString][associatedZone] + 1
+    env.info("CON: voteTables " .. UTILS.OneLineSerialize(voteTables[coalitionString]))
 end
 
 
-function endVote()
+function endVote(coalitionString)
     local maxVote = 0
     local associatedZone = nil
-    for zoneName, voteValue in pairs(voteTable) do
+    for zoneName, voteValue in pairs(voteTables[coalitionString]) do
         if voteValue > maxVote then
             associatedZone = zoneName
         end
     end
 
     if associatedZone ~= nil then
-        env.info("CON: We have a winner ! " .. associatedZone)
+        voteResult[coalitionString] = associatedZone
+        env.info("CON: We have a winner ! " .. voteResult[coalitionString])
         -- do something!
     end
+    voteOn = false
 end
 
-function initiateVote(votingDelay)
-    voteTable = {}
+function InitiateVote(coalitionString, votingDelay)
+    if voteInProgress == true then
+        -- disable voting until current vote in progress is finished
+        -- message coalition
+        return
+    end
+
+    voteTables[coalitionString] = {}
+    voteResult[coalitionString] = nil
     voteOn = true
-    SCHEDULER:New(nil, endVote, {"something"}, votingDelay)
-    -- reset results
-    -- switch vote to true
-    -- schedule end of vote
+    voteInProgressCoalition = coalitionString
+    SCHEDULER:New(nil, endVote, {coalitionString}, votingDelay)
 end
 
 
@@ -81,7 +100,7 @@ local function markRemoved(Event)
                 coalitionString = "Blue"
             end
             local coalitionZones = ConquestZones[coalitionString]
-            handleVote(coord, coalitionZones)
+            handleVote(coord, coalitionZones, coalitionString)
         end
     end
 end

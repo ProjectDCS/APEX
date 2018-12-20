@@ -61,6 +61,7 @@ function startZoneCoalition(zone, coalitionString)
     end
     function ZoneCaptureCoalition:OnEnterEmpty()
         env.info("CON: Detected Empty in zone " .. ZoneCaptureCoalition:GetZoneName())
+        
     end
     function ZoneCaptureCoalition:OnEnterCaptured( From, Event, To )
         local Coalition = self:GetCoalition()
