@@ -57,6 +57,8 @@ function endVote(coalitionString)
         voteResult[coalitionString] = associatedZone
         env.info("CON: We have a winner ! " .. voteResult[coalitionString])
         -- do something!
+        local zone = ZONE:New(associatedZone)
+        SpawnJTAC(coalitionString, zone)
     end
     voteOn = false
 end
@@ -95,12 +97,15 @@ local function markRemoved(Event)
         elseif Event.text:lower():find("-redtanks") then
             -- handleTankerRequest(text, coord)
         elseif Event.text:lower():find("-vote") then
-            local coalitionString = "Red"
+            -- Red coalition
+            local voteCoalitionString = "Red"
+            local zoneCoalitionString = "Blue"
             if Event.coalition == coalition.side.BLUE then
-                coalitionString = "Blue"
+                voteCoalitionString = "Blue"
+                zoneCoalitionString = "Red"
             end
-            local coalitionZones = ConquestZones[coalitionString]
-            handleVote(coord, coalitionZones, coalitionString)
+            local coalitionZones = ConquestZones[zoneCoalitionString]
+            handleVote(coord, coalitionZones, voteCoalitionString)
         end
     end
 end

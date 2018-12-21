@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------------------------------
 
 function initiateBlueVoting()
-    InitiateVote("Blue", 30)
+    InitiateVote("Blue", 20)
 end
 
 function initiateRedVoting()
-    InitiateVote("Red", 30)
+    InitiateVote("Red", 20)
 end
 
 local function permanentPlayerMenu(something)
@@ -27,11 +27,12 @@ local function permanentPlayerMenu(something)
 
             PlayerMenuMap[playerID] = groupMenu
         else
-            local deleteGroupMenu = PlayerMenuMap[playerID]
-            if deleteGroupMenu ~= nil then
-                deleteGroupMenu:Remove()
-            end
-            PlayerMenuMap[playerID] = nil
+            -- groupMenu is actually Boolean
+            -- local deleteGroupMenu = PlayerMenuMap[playerID]
+            -- if deleteGroupMenu ~= nil then
+            --     deleteGroupMenu:Remove()
+            -- end
+            -- PlayerMenuMap[playerID] = nil
         end
     end
 end
