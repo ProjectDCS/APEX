@@ -7,10 +7,12 @@ end
 
 function initiateBlueVoting()
     InitiateVote("Blue", 20)
+    trigger.action.outTextForCoalition( 2, "Voting for for focusing the effort on a specic zone has been initiated\nYou have 45 seconds to cast your vote using a user mark with the text '-vote'", 35)
 end
 
 function initiateRedVoting()
     InitiateVote("Red", 20)
+    trigger.action.outTextForCoalition( 1,  "Voting for for focusing the effort on a specic zone has been initiated\nYou have 45 seconds to cast your vote using a user mark with the text '-vote'", 35)
 end
 
 local function permanentPlayerMenu(something)
@@ -24,9 +26,9 @@ local function permanentPlayerMenu(something)
             
             local groupMenu = nil
             if playerClient:GetCoalition() == coalition.side.BLUE then
-                groupMenu = MENU_GROUP_COMMAND:New( playerGroup, "Bombers Voting", IntelMenu, initiateBlueVoting, playerClient )
+                groupMenu = MENU_GROUP_COMMAND:New( playerGroup, "Initiate Voting", IntelMenu, initiateBlueVoting, playerClient )
             elseif playerClient:GetCoalition() == coalition.side.RED then
-                groupMenu = MENU_GROUP_COMMAND:New( playerGroup, "Bombers Voting", IntelMenu, initiateRedVoting, playerClient )
+                groupMenu = MENU_GROUP_COMMAND:New( playerGroup, "Initiate Voting", IntelMenu, initiateRedVoting, playerClient )
             end
 
             PlayerMenuMap[playerID] = groupMenu

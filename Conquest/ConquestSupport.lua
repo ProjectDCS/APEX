@@ -56,6 +56,7 @@ function endVote(coalitionString)
     if associatedZone ~= nil then
         VoteResult[coalitionString] = associatedZone
         env.info("CON: We have a winner ! " .. VoteResult[coalitionString])
+        trigger.action.outTextForCoalition( ternary(coalitionString == "Blue", 2, 1), "Votes are in!\n\nYou have selected " .. VoteResult[coalitionString] " as the focus zone", 35)
         -- do something!
         local zone = ZONE:New(associatedZone)
         SpawnJTAC(coalitionString, zone)
