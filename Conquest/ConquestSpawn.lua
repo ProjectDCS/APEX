@@ -37,7 +37,6 @@ end
 function SpawnOppositionClass(classString, coalitionString, zone)
     local startZoneString = coalitionString .. " Start Zone"
     local spawnString = coalitionString .. " " .. classString
-    env.info("CON: Trying to spawn " .. spawnString .. "in zone " .. startZoneString)
     local spawn = SPAWN:New(spawnString)
     spawn:OnSpawnGroup(
         function(spawnGroup)
