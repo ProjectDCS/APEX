@@ -1,3 +1,7 @@
+local function ternary ( cond , T , F )
+    if cond then return T else return F end
+end
+
 --------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------
 
@@ -45,37 +49,23 @@ PlayerMap = {
     ["Red"] = {}
 }
 
-RedSetPlayer = SET_CLIENT:New():FilterCoalitions("red"):FilterActive():FilterStart()
-BlueSetPlayer = SET_CLIENT:New():FilterCoalitions("blue"):FilterActive():FilterStart()
+SetPlayer = SET_CLIENT:New():FilterActive():FilterStart()
 
 
 local function permanentPlayerCheck(something)
-    BlueSetPlayer:ForEachClient(
+    SetPlayer:ForEachClient(
         function (PlayerClient)
-            env.info("CON: Checking blue player " .. UTILS.OneLineSerialize(PlayerClient))
+            -- env.info("CON: Checking player " .. UTILS.OneLineSerialize(PlayerClient))
             local PlayerID = PlayerClient.ObjectName
+            local coalitionString = ternary(PlayerClient:GetCoalition() == coalition.side.BLUE, "Blue", "Red")
+
             PlayerClient:AddBriefing("Welcome to Conquest! \\o/!\n\n Remember to vote to steer your team to victory using the user marks!")
 
             if PlayerClient:IsAlive() then
-                PlayerMap["Blue"][PlayerID] = true
+                PlayerMap[coalitionString][PlayerID] = true
                 PlayerMenuMap[PlayerID] = true
             else
-                PlayerMap["Blue"][PlayerID] = false
-                PlayerMenuMap[PlayerID] = false
-            end
-        end
-    )
-    RedSetPlayer:ForEachClient(
-        function (PlayerClient)
-            env.info("CON: Checking red player " .. UTILS.OneLineSerialize(PlayerClient))
-            local PlayerID = PlayerClient.ObjectName
-            PlayerClient:AddBriefing("Welcome to Conquest! \\o/!\n\n Remember to vote to steer your team to victory using the user marks!")
-
-            if PlayerClient:IsAlive() then
-                PlayerMap["Red"][PlayerID] = true
-                PlayerMenuMap[PlayerID] = true
-            else
-                PlayerMap["Red"][PlayerID] = false
+                PlayerMap[coalitionString][PlayerID] = false
                 PlayerMenuMap[PlayerID] = false
             end
         end
