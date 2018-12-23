@@ -27,14 +27,14 @@ local function handleVote(coord, coalitionZones, coalitionString) --assumes ZONE
     local associatedZone = nil
     for zoneName, ZoneCaptureCoalition in pairs(coalitionZones) do
         local distance = coord:Get2DDistance(ZoneCaptureCoalition:GetZone():GetCoordinate())
-        env.info(string.format( "CON: new Distance %d compared to %d", distance, minDistance))
+        -- env.info(string.format( "CON: new Distance %d compared to %d", distance, minDistance))
         if distance < minDistance then
             minDistance = distance
             associatedZone = zoneName
         end
     end
 
-    env.info("CON: voting result " .. associatedZone)
+    env.info("CON: 1 vote casted:" .. associatedZone)
 
     if voteTables[coalitionString][associatedZone] == nil then
         voteTables[coalitionString][associatedZone] = 0
