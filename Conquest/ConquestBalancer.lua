@@ -56,4 +56,4 @@ function refreshBalancer(something)
     env.info("CON:Balancer Table " .. UTILS.OneLineSerialize(BalancerTable))
 end
 
--- SCHEDULER:New(nil, refreshBalancer, {"something"}, 15, 15)
+SCHEDULER:New(nil, refreshBalancer, {"something"}, 15, 15)
