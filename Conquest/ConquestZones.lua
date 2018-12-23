@@ -108,12 +108,25 @@ end
 function startPopulateZones(something)
     local SelectedBlueZonesTable = randomizeSelectTable(ZoneCount, ZoneToPopulateCount)
     local SelectedRedZonesTable = randomizeSelectTable(ZoneCount, ZoneToPopulateCount)
-    env.info("CON: Selected Blue Zones " .. UTILS.OneLineSerialize(SelectedBlueZonesTable))
+    -- env.info("CON: Selected Blue Zones " .. UTILS.OneLineSerialize(SelectedBlueZonesTable))
 
     populateZones("Blue", SelectedBlueZonesTable)
     populateZones("Red", SelectedRedZonesTable)
 
-    env.info("CON: Blue Zones " .. UTILS.OneLineSerialize(ConquestZones["Blue"]))
+    local keyset={}
+    for k,v in pairs(ConquestZones["Red"]) do
+        keyset[#keyset + 1]=k
+    end
+    VoteResult["Blue"] = keyset[math.random( 1, #keyset)]
+
+    keyset = {}
+    for k,v in pairs(ConquestZones["Blue"]) do
+        keyset[#keyset + 1]=k
+    end
+    VoteResult["Red"] = keyset[math.random( 1, #keyset)]
+
+    -- env.info("CON: Blue Zones " .. UTILS.OneLineSerialize(ConquestZones["Blue"]))
+    -- env.info('CON: Red Focus Zone ' .. UTILS.OneLineSerialize(VoteResult["Red"]))
 end
 
 SCHEDULER:New(nil, startPopulateZones, {"sdfsdfd"}, 2)

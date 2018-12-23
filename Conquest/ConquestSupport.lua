@@ -12,7 +12,7 @@ local voteTables = {
     ["Blue"] = {},
     ["Red"] = {}
 }
-local voteResult = {
+VoteResult = {
     ["Blue"] = nil,
     ["Red"] = nil
 }
@@ -54,8 +54,8 @@ function endVote(coalitionString)
     end
 
     if associatedZone ~= nil then
-        voteResult[coalitionString] = associatedZone
-        env.info("CON: We have a winner ! " .. voteResult[coalitionString])
+        VoteResult[coalitionString] = associatedZone
+        env.info("CON: We have a winner ! " .. VoteResult[coalitionString])
         -- do something!
         local zone = ZONE:New(associatedZone)
         SpawnJTAC(coalitionString, zone)
@@ -71,7 +71,7 @@ function InitiateVote(coalitionString, votingDelay)
     end
 
     voteTables[coalitionString] = {}
-    voteResult[coalitionString] = nil
+    VoteResult[coalitionString] = nil
     voteOn = true
     voteInProgressCoalition = coalitionString
     SCHEDULER:New(nil, endVote, {coalitionString}, votingDelay)

@@ -45,13 +45,14 @@ PlayerMap = {
     ["Red"] = {}
 }
 
-BlueSetPlayer = SET_CLIENT:New():FilterCoalitions("blue"):FilterActive():FilterStart()
 RedSetPlayer = SET_CLIENT:New():FilterCoalitions("red"):FilterActive():FilterStart()
+BlueSetPlayer = SET_CLIENT:New():FilterCoalitions("blue"):FilterActive():FilterStart()
 
 
 local function permanentPlayerCheck(something)
     BlueSetPlayer:ForEachClient(
         function (PlayerClient)
+            env.info("CON: Checking blue player " .. UTILS.OneLineSerialize(PlayerClient))
             local PlayerID = PlayerClient.ObjectName
             PlayerClient:AddBriefing("Welcome to Conquest! \\o/!\n\n Remember to vote to steer your team to victory using the user marks!")
 
@@ -66,6 +67,7 @@ local function permanentPlayerCheck(something)
     )
     RedSetPlayer:ForEachClient(
         function (PlayerClient)
+            env.info("CON: Checking red player " .. UTILS.OneLineSerialize(PlayerClient))
             local PlayerID = PlayerClient.ObjectName
             PlayerClient:AddBriefing("Welcome to Conquest! \\o/!\n\n Remember to vote to steer your team to victory using the user marks!")
 
@@ -79,8 +81,8 @@ local function permanentPlayerCheck(something)
         end
     )
 
-    -- env.info("CON: Permanent Blue Players " .. UTILS.OneLineSerialize(PlayerMap["Blue"]))
-    -- env.info("CON: Permanent Red Players " .. UTILS.OneLineSerialize(PlayerMap["Red"]))
+    env.info("CON: Permanent Blue Players " .. UTILS.OneLineSerialize(PlayerMap["Blue"]))
+    env.info("CON: Permanent Red Players " .. UTILS.OneLineSerialize(PlayerMap["Red"]))
 end
 
 SCHEDULER:New(nil, permanentPlayerCheck, {"Something"}, 3, 10)

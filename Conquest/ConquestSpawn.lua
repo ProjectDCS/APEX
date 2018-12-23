@@ -34,6 +34,21 @@ function SpawnJTAC(coalitionString, zone)
     spawn:SpawnInZone(zone)
 end
 
+function SpawnOppositionClass(classString, coalitionString, zone)
+    local startZoneString = coalitionString .. " Start Zone"
+    local spawnString = coalitionString .. " " .. classString
+    local spawn = SPAWN:New(spawnString)
+    spawn:OnSpawnGroup(
+        function(spawnGroup)
+            local routeTask = spawnGroup:TaskOrbitCircleAtVec2( zone:GetCoordinate():GetVec2(), UTILS.FeetToMeters(10000),  UTILS.KnotsToMps(300) )
+            spawnGroup:SetTask(routeTask, 2)
+        end
+    )
+    
+    local spawnedGroup = spawn:SpawnInZone(ZONE:FindByName(startZoneString))
+    return spawnedGroup
+end
+
 --------------------------------------------------------------------------------------------
 local SpawnsTable = {
     ["Blue"] = {},
