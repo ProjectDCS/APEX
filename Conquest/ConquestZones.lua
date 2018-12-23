@@ -80,7 +80,7 @@ function startZoneCoalition(zone, coalitionString)
                 SpawnZoneBaseRandomSpawn("Blue", zoneToReinforce)
             end
         end
-        SCHEDULER:New(nil, spawnReinforcement, {Coalition, zone}, 70)
+        SCHEDULER:New(nil, spawnReinforcement, {Coalition, zone}, 700)
         ZoneCaptureCoalition:__Guard(newCoalition)
     end
 
