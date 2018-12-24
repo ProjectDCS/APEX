@@ -18,6 +18,10 @@ CaptureZoneBaseTemplateGroupCount = 7
 -- REDZoneAssaultString = "Red Zone Assault #1"
 -- REDZONEEscortString = "Red Zone Escort #1"
 
+SpawnsTableConcurrent = {
+    ["Blue"] = {},
+    ["Red"] = {}
+}
 --------------------------------------------------------------------------------------------
 
 function SpawnJTAC(coalitionString, zone)
@@ -49,21 +53,40 @@ function SpawnOppositionClass(classString, coalitionString, zone)
     return spawnedGroup
 end
 
+function SpawnTaskforce(classString, coalitionString, zoneName)
+    local spawnString = coalitionString .. " Taskforce " .. classString
+    local zone = ZONE:FindByName(zoneName)
+    local spawn = SpawnsTableConcurrent[coalitionString][spawnString]
+    if spawn == nil then
+        env.info("CON: Trying to create spawn fronm " .. spawnString)
+        local newSpawn = SPAWN:New(spawnString)
+        SpawnsTableConcurrent[coalitionString][spawnString] = newSpawn
+        spawn = newSpawn
+    end
+
+
+    spawn:OnSpawnGroup(
+        function(spawnGroup)
+            local routeTask = spawnGroup:TaskOrbitCircleAtVec2( zone:GetCoordinate():GetVec2(), UTILS.FeetToMeters(10000),  UTILS.KnotsToMps(300) )
+            spawnGroup:SetTask(routeTask, 2)
+        end
+    )
+    
+    local spawnedGroup = spawn:SpawnInZone(zone)
+    return spawnedGroup
+end
+
 --------------------------------------------------------------------------------------------
-local SpawnsTable = {
-    ["Blue"] = {},
-    ["Red"] = {}
-}
 
 function SpawnZoneBaseRandomSpawn(coalitionString, zone)
     local random = math.random( 1, CaptureZoneBaseTemplateCount )
     local baseString = coalitionString .. " " .. CaptureZoneBaseString .. tostring(random)
     for i = 1, CaptureZoneBaseTemplateGroupCount do
         local spawnString = baseString .. "(" .. tostring(i) .. ")"
-        local spawn = SpawnsTable[coalitionString][spawnString]
+        local spawn = SpawnsTableConcurrent[coalitionString][spawnString]
         if spawn == nil then
             local newSpawn = SPAWN:New(spawnString)
-            SpawnsTable[coalitionString][spawnString] = newSpawn
+            SpawnsTableConcurrent[coalitionString][spawnString] = newSpawn
             spawn = newSpawn
         end
         spawn:SpawnInZone(zone, true)
@@ -73,14 +96,35 @@ end
 function SpawnZoneCaptureRandomSpawn(coalitionString, zone)
     -- spawn after capture units
     local spawnString = coalitionString .. " " .. CaptureZoneFirstSpawnString
-    local spawn = SpawnsTable[coalitionString][spawnString]
+    local spawn = SpawnsTableConcurrent[coalitionString][spawnString]
     if spawn == nil then
         local newSpawn = SPAWN:New(spawnString)
-        SpawnsTable[coalitionString][spawnString] = newSpawn
+        SpawnsTableConcurrent[coalitionString][spawnString] = newSpawn
         spawn = newSpawn
     end
     spawn:SpawnInZone(zone, true)
 end
+
+function ScheduledSpawnTaskforce(coalitionString)
+    env.info("CON: Spawning " .. coalitionString .. " Taskforce")
+    SpawnTaskforce("A2A", coalitionString, VoteResult[coalitionString])
+    SpawnTaskforce("MR", coalitionString, VoteResult[coalitionString])
+    SpawnTaskforce("A2G", coalitionString, VoteResult[coalitionString])
+    SpawnTaskforce("X", coalitionString, VoteResult[coalitionString])
+end
+
+function scheduleTaskforce(something)
+    local blueTimer = math.random (1500, 2000)
+    local redTimer = math.random(1500, 2000)
+
+    env.info(string.format( "CON: Blue Taskforce timer %d Red Taskforce timer %d", blueTimer, redTimer))
+    SCHEDULER:New(nil, ScheduledSpawnTaskforce, {"Blue"}, blueTimer)
+    SCHEDULER:New(nil, ScheduledSpawnTaskforce, {"Red"}, redTimer)
+end
+
+SCHEDULER:New(nil, scheduleTaskforce, {"Blue"}, 100, 1800) -- Recurrent Spawn
+SCHEDULER:New(nil, ScheduledSpawnTaskforce, {"Blue"}, 40) -- Initial Spawn
+SCHEDULER:New(nil, ScheduledSpawnTaskforce, {"Red"}, 41) -- Initial Spawn
 
 ---------------------------------------------------------------------------------------------
 env.info("CON: Troops are ready")
