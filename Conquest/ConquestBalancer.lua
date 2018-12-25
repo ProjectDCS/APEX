@@ -31,14 +31,11 @@ function refreshBalancer(something)
 
             local classString = nil
             for i = 1, #classPrefixTable do
-                -- local prefixString = coalitionString .. " " .. classPrefixTable[i]
                 local prefixString = classPrefixTable[i]
                 if string.match(playerID, prefixString) then
                     classString = classPrefixTable[i]
                 end
             end
-
-            
             local focusZone = ZONE:FindByName(VoteResult[oppositionString])
             env.info("CON: Selected class string " .. classString .. " at zone " .. VoteResult[oppositionString] )
             local oppositionGroup = SpawnOppositionClass(classString, oppositionString, focusZone)
@@ -50,6 +47,8 @@ function refreshBalancer(something)
             local baseZone = ZONE:FindByName(baseZoneString)
             -- playerOpposition.TaskLandAtZone(baseZone, 10, false)
             playerOpposition:Destroy()
+            BalancerTable[playerID] = nil
+        elseif playerOpposition ~= nil and playerOpposition:IsAlive() == false then
             BalancerTable[playerID] = nil
         end
     end

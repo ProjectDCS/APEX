@@ -85,6 +85,20 @@ local function spawnTanks(coord)
     tankSpawn:SpawnFromCoordinate(coord)
 end
 
+local destroyZoneCount = 0
+local function destroyRequest(coord)
+    local destroyZoneName = string.format("destroy %d", destroyZoneCount)
+    local zoneRadiusToDestroy = ZONE_RADIUS:New(destroyZoneName, coord:GetVec2(), 8000)
+    destroyZoneCount = destroyZoneCount + 1
+    local function destroyUnit(zoneUnit)
+        env.info(string.format("BTI: Found unit in zone %s", destroyZoneName))
+        env.info(string.format("BTI: Salvaging command received, executing"))
+        zoneUnit:Destroy()
+        return true
+    end
+    zoneRadiusToDestroy:SearchZone(destroyUnit, Object.Category.UNIT)
+end
+
 local function markRemoved(Event)
     if Event.text~=nil and Event.text:lower():find("-") then 
         env.info("CON: mark removed event " .. UTILS.OneLineSerialize(Event))
@@ -95,6 +109,8 @@ local function markRemoved(Event)
 
         if Event.text:lower():find("-tanks") then
             spawnTanks(coord)
+        elseif Event.text.lower():find("-toto destroy") then
+            destroyRequest(coord)
         elseif Event.text:lower():find("-redtanks") then
             -- handleTankerRequest(text, coord)
         elseif Event.text:lower():find("-vote") then

@@ -44,8 +44,10 @@ function SpawnOppositionClass(classString, coalitionString, zone)
     local spawn = SPAWN:New(spawnString)
     spawn:OnSpawnGroup(
         function(spawnGroup)
-            local routeTask = spawnGroup:TaskOrbitCircleAtVec2( zone:GetCoordinate():GetVec2(), UTILS.FeetToMeters(10000),  UTILS.KnotsToMps(300) )
-            spawnGroup:SetTask(routeTask, 2)
+            local casTask = spawnGroup:EnRouteTaskEngageTargets( 20000, { "All" }, 1 )
+            spawnGroup:SetTask(casTask, 2)
+            local orbitTask = spawnGroup:TaskOrbitCircleAtVec2( zone:GetCoordinate():GetVec2(), UTILS.FeetToMeters(8000), UTILS.KnotsToMps(270))
+            spawnGroup:PushTask(orbitTask, 4)
         end
     )
     
@@ -58,7 +60,7 @@ function SpawnTaskforce(classString, coalitionString, zoneName)
     local zone = ZONE:FindByName(zoneName)
     local spawn = SpawnsTableConcurrent[coalitionString][spawnString]
     if spawn == nil then
-        env.info("CON: Trying to create spawn fronm " .. spawnString)
+        env.info("CON: Trying to create spawn from " .. spawnString)
         local newSpawn = SPAWN:New(spawnString)
         SpawnsTableConcurrent[coalitionString][spawnString] = newSpawn
         spawn = newSpawn
@@ -67,8 +69,10 @@ function SpawnTaskforce(classString, coalitionString, zoneName)
 
     spawn:OnSpawnGroup(
         function(spawnGroup)
-            local routeTask = spawnGroup:TaskOrbitCircleAtVec2( zone:GetCoordinate():GetVec2(), UTILS.FeetToMeters(10000),  UTILS.KnotsToMps(300) )
-            spawnGroup:SetTask(routeTask, 2)
+            local casTask = spawnGroup:EnRouteTaskEngageTargets( 20000, { "All" }, 1 )
+            spawnGroup:SetTask(casTask, 2)
+            local orbitTask = spawnGroup:TaskOrbitCircleAtVec2( zone:GetCoordinate():GetVec2(), UTILS.FeetToMeters(8000), UTILS.KnotsToMps(270))
+            spawnGroup:PushTask(orbitTask, 4)
         end
     )
     
@@ -123,8 +127,8 @@ function scheduleTaskforce(something)
 end
 
 SCHEDULER:New(nil, scheduleTaskforce, {"Blue"}, 100, 1800) -- Recurrent Spawn
-SCHEDULER:New(nil, ScheduledSpawnTaskforce, {"Blue"}, 40) -- Initial Spawn
-SCHEDULER:New(nil, ScheduledSpawnTaskforce, {"Red"}, 41) -- Initial Spawn
+SCHEDULER:New(nil, ScheduledSpawnTaskforce, {"Blue"}, 25) -- Initial Spawn
+SCHEDULER:New(nil, ScheduledSpawnTaskforce, {"Red"}, 26) -- Initial Spawn
 
 ---------------------------------------------------------------------------------------------
 env.info("CON: Troops are ready")
