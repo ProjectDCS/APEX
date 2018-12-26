@@ -109,10 +109,6 @@ local function markRemoved(Event)
 
         if Event.text:lower():find("-tanks") then
             spawnTanks(coord)
-        elseif Event.text.lower():find("-toto destroy") then
-            destroyRequest(coord)
-        elseif Event.text:lower():find("-redtanks") then
-            -- handleTankerRequest(text, coord)
         elseif Event.text:lower():find("-vote") then
             -- Red coalition
             local voteCoalitionString = "Red"

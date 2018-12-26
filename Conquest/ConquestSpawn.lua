@@ -41,10 +41,16 @@ end
 function SpawnOppositionClass(classString, coalitionString, zone)
     local startZoneString = coalitionString .. " Start Zone"
     local spawnString = coalitionString .. " " .. classString
-    local spawn = SPAWN:New(spawnString)
+    local spawn = SpawnsTableConcurrent[coalitionString][spawnString]
+    if spawn == nil then
+        env.info("CON: Trying to create spawn from " .. spawnString)
+        local newSpawn = SPAWN:New(spawnString)
+        SpawnsTableConcurrent[coalitionString][spawnString] = newSpawn
+        spawn = newSpawn
+    end
     spawn:OnSpawnGroup(
         function(spawnGroup)
-            local casTask = spawnGroup:EnRouteTaskEngageTargets( 20000, { "All" }, 1 )
+            local casTask = spawnGroup:EnRouteTaskEngageTargets( 25000, { "All" }, 1 )
             spawnGroup:SetTask(casTask, 2)
             local orbitTask = spawnGroup:TaskOrbitCircleAtVec2( zone:GetCoordinate():GetVec2(), UTILS.FeetToMeters(8000), UTILS.KnotsToMps(270))
             spawnGroup:PushTask(orbitTask, 4)
