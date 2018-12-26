@@ -50,17 +50,23 @@ function startZoneCoalition(zone, coalitionString)
     ---------------------------------------------------------------------------------------
     
     function ZoneCaptureCoalition:OnAfterDestroyedUnit(From, Event, To, unit, PlayerName)
-        env.info(string.format('CON: Detected destroyed unit %s', Event))
         env.info("CON: Detected hit in zone " .. ZoneCaptureCoalition:GetZoneName())
     end
     function ZoneCaptureCoalition:OnEnterGuarded( From, Event, To )
         env.info("CON: Detected Guarded in zone " .. ZoneCaptureCoalition:GetZoneName())
+        trigger.action.outTextForCoalition(2, ZoneCaptureCoalition:GetZoneName() .. "is now guarded", 20)
+        trigger.action.outTextForCoalition(1, ZoneCaptureCoalition:GetZoneName() .. "is now guarded", 20)
     end
     function ZoneCaptureCoalition:OnEnterAttacked(From, Event, To)
         env.info("CON: Detected Atack in zone " .. ZoneCaptureCoalition:GetZoneName())
+        trigger.action.outTextForCoalition(2, ZoneCaptureCoalition:GetZoneName() .. "attacked", 20)
+        trigger.action.outTextForCoalition(1, ZoneCaptureCoalition:GetZoneName() .. "attacked", 20)
     end
     function ZoneCaptureCoalition:OnEnterCaptured( From, Event, To )
+        local Coalition = self:GetCoalition()
         env.info("CON: Detected captured in zone " .. ZoneCaptureCoalition:GetZoneName())
+        trigger.action.outTextForCoalition(2, ZoneCaptureCoalition:GetZoneName() .. "captured", 20)
+        trigger.action.outTextForCoalition(1, ZoneCaptureCoalition:GetZoneName() .. "captured", 20)
     end
     function ZoneCaptureCoalition:OnEnterEmpty()
         env.info("CON: Detected Empty in zone " .. ZoneCaptureCoalition:GetZoneName())
@@ -74,8 +80,8 @@ function startZoneCoalition(zone, coalitionString)
         else
             SpawnZoneCaptureRandomSpawn("Blue", zone)
             newCoalition = 2
-            trigger.action.outTextForCoalition(2, "We captured " .. ZoneCaptureCoalition:GetZoneName(), 20)
-            trigger.action.outTextForCoalition(1, "The enemy captured " .. ZoneCaptureCoalition:GetZoneName(), 20)
+            trigger.action.outTextForCoalition(1, "We captured " .. ZoneCaptureCoalition:GetZoneName(), 20)
+            trigger.action.outTextForCoalition(2, "The enemy captured " .. ZoneCaptureCoalition:GetZoneName(), 20)
         end
         local function spawnReinforcement(CoalitionToReinforce, zoneToReinforce)
             if CoalitionToReinforce == coalition.side.BLUE then
@@ -84,7 +90,7 @@ function startZoneCoalition(zone, coalitionString)
                 SpawnZoneBaseRandomSpawn("Blue", zoneToReinforce)
             end
         end
-        SCHEDULER:New(nil, spawnReinforcement, {Coalition, zone}, 700)
+        SCHEDULER:New(nil, spawnReinforcement, {Coalition, zone}, 300)
         ZoneCaptureCoalition:__Guard(newCoalition)
     end
 
