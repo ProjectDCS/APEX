@@ -38,6 +38,43 @@ function SpawnJTAC(coalitionString, zone)
     spawn:SpawnInZone(zone)
 end
 
+function TaskBomber(spawnedGroup)
+    local bombTask = spawnedGroup:TaskAttackUnit(unitToAttack, true, AI.Task.WeaponExpend.ALL)
+    spawnGroup:SetTask(bombTask, 1)
+end
+
+function SpawnBomber(coalitionString, attackZone, instance)
+    local zone = ZONE:FindByName(attackZone)
+    local spawnString = coalitionString .. " Bomber " .. instance
+    local spawn = SpawnsTableConcurrent[coalitionString][spawnString]
+    if spawn == nil then
+        env.info("CON: Trying to create spawn from " .. spawnString)
+        local newSpawn = SPAWN:New(spawnString)
+        SpawnsTableConcurrent[coalitionString][spawnString] = newSpawn
+        spawn = newSpawn
+    end
+
+    env.info("CON: Trying detection for zone " .. attackZone)
+    local unitToAttack = nil
+    local function detectUnit(zoneUnit)
+        env.info(string.format("CON: Found unit in zone %s", attackZone))
+        unitToAttack = zoneUnit
+        return true
+    end
+    local zoneRadiusToDestroy = ZONE_RADIUS:New("ZoneDetection", zone:GetVec2(), 5000)
+    zoneRadiusToDestroy:SearchZone(detectUnit, Object.Category.UNIT)
+
+    spawn:OnSpawnGroup(
+        function(spawnGroup)
+            local bombTask = spawnGroup:TaskAttackUnit(unitToAttack, true, AI.Task.WeaponExpend.ALL)
+            spawnGroup:SetTask(bombTask, 1)
+        end
+    )
+
+    local spawnedGroup = spawn:Spawn()
+    return spawnedGroup
+end
+
 function SpawnOppositionClass(classString, coalitionString, zone)
     local startZoneString = coalitionString .. " Start Zone"
     local spawnString = coalitionString .. " " .. classString
@@ -82,7 +119,7 @@ function SpawnTaskforce(classString, coalitionString, zoneName)
         end
     )
     
-    local spawnedGroup = spawn:SpawnInZone(zone)
+    local spawnedGroup = spawn:Spawn()
     return spawnedGroup
 end
 
@@ -123,18 +160,42 @@ function ScheduledSpawnTaskforce(coalitionString)
     SpawnTaskforce("X", coalitionString, VoteResult[coalitionString])
 end
 
+function ScheduledSpawnBomber(coalitionString)
+    env.info("CON: Spawning " .. coalitionString .. " Bombers")
+    SpawnBomber(coalitionString, VoteResult[coalitionString], "A")
+    SpawnBomber(coalitionString, VoteResult[coalitionString], "B")
+end
+
+-------------------------------------------------------------------------------------------------------------
 function scheduleTaskforce(something)
     local blueTimer = math.random (1500, 2000)
     local redTimer = math.random(1500, 2000)
 
-    env.info(string.format( "CON: Blue Taskforce timer %d Red Taskforce timer %d", blueTimer, redTimer))
+    env.info(string.format( "CON: Blue Bomber timer %d Red Bomber timer %d", blueTimer, redTimer))
     SCHEDULER:New(nil, ScheduledSpawnTaskforce, {"Blue"}, blueTimer)
     SCHEDULER:New(nil, ScheduledSpawnTaskforce, {"Red"}, redTimer)
 end
 
-SCHEDULER:New(nil, scheduleTaskforce, {"Blue"}, 100, 1800) -- Recurrent Spawn
+function scheduleBomber(something)
+    local blueTimer = math.random (1200, 1700)
+    local redTimer = math.random(1200, 1700)
+
+    env.info(string.format( "CON: Blue Taskforce timer %d Red Taskforce timer %d", blueTimer, redTimer))
+    SCHEDULER:New(nil, ScheduledSpawnBomber, {"Blue"}, blueTimer)
+    SCHEDULER:New(nil, ScheduledSpawnBomber, {"Red"}, redTimer)
+end
+
+SCHEDULER:New(nil, scheduleTaskforce, {"something"}, 100, 1800)
+SCHEDULER:New(nil, scheduleBomber, {"something"}, 10, 1400)
 SCHEDULER:New(nil, ScheduledSpawnTaskforce, {"Blue"}, 25) -- Initial Spawn
 SCHEDULER:New(nil, ScheduledSpawnTaskforce, {"Red"}, 26) -- Initial Spawn
 
 ---------------------------------------------------------------------------------------------
+
+function debug()
+    SpawnBomber("Blue", VoteResult["Blue"], "A")
+end
+
+-- SCHEDULER:New(nil, debug, {"something"}, 15)
+
 env.info("CON: Troops are ready")

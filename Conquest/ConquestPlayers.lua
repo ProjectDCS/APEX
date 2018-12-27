@@ -73,8 +73,8 @@ local function permanentPlayerCheck(something)
         end
     )
 
-    env.info("CON: Permanent Blue Players " .. UTILS.OneLineSerialize(PlayerMap["Blue"]))
-    env.info("CON: Permanent Red Players " .. UTILS.OneLineSerialize(PlayerMap["Red"]))
+    -- env.info("CON: Permanent Blue Players " .. UTILS.OneLineSerialize(PlayerMap["Blue"]))
+    -- env.info("CON: Permanent Red Players " .. UTILS.OneLineSerialize(PlayerMap["Red"]))
 end
 
 SCHEDULER:New(nil, permanentPlayerCheck, {"Something"}, 3, 10)
